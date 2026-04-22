@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+body {
+  background-color: #050507;
+  color: #f8fafc;
+  @apply antialiased selection:bg-[#22d3ee]/30 selection:text-[#22d3ee];
+}
+
+.immersive-glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.immersive-neon-border {
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.2), inset 0 0 10px rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.4);
+}
+
+.immersive-accent-text {
+  color: #22d3ee;
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
+}
+
+.immersive-pill {
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  color: #22d3ee;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.immersive-btn-primary {
+  background: #22d3ee;
+  color: #050507;
+  font-weight: 600;
+}
