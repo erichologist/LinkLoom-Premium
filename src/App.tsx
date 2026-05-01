@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, Reorder, AnimatePresence } from 'motion/react';
-import { Settings2, Link as LinkIcon, Trash2, Copy, AlertCircle, Plus, Check, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Settings2, Link as LinkIcon, Trash2, Copy, AlertCircle, Plus, Check, Loader2, Image as ImageIcon, Download } from 'lucide-react';
 import { LinkPreview, AppSettings } from './types';
 
 export default function App() {
@@ -106,6 +106,20 @@ export default function App() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const downloadCode = () => {
+    const content = generateExportCode();
+    const extension = settings.format === 'html' ? 'html' : 'md';
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `linkloom-export.${extension}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#050507]">
       
@@ -196,13 +210,22 @@ export default function App() {
                   </button>
                 </div>
 
-                <button
-                  onClick={copyToClipboard}
-                  className="w-full flex items-center justify-center gap-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-[#f8fafc] font-medium py-3 rounded-xl hover:bg-[rgba(255,255,255,0.1)] transition-all font-sans cursor-pointer"
-                >
-                  {copied ? <Check size={18} className="text-[#22d3ee]" /> : <Copy size={18} />}
-                  {copied ? 'Copied!' : 'Copy Code Snippet'}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={copyToClipboard}
+                    className="flex-1 flex items-center justify-center gap-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-[#f8fafc] font-medium py-3 rounded-xl hover:bg-[rgba(255,255,255,0.1)] transition-all font-sans cursor-pointer"
+                  >
+                    {copied ? <Check size={18} className="text-[#22d3ee]" /> : <Copy size={18} />}
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                  <button
+                    onClick={downloadCode}
+                    className="flex-1 flex items-center justify-center gap-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-[#f8fafc] font-medium py-3 rounded-xl hover:bg-[rgba(255,255,255,0.1)] transition-all font-sans cursor-pointer"
+                  >
+                    <Download size={18} />
+                    Download
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -239,18 +262,15 @@ export default function App() {
                 className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-20"
                 axis="y"
               >
-                <AnimatePresence>
-                  {previews.map((preview) => (
-                    <Reorder.Item
-                      key={preview.id}
-                      value={preview}
-                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      // Need to add this class for grid compatibility with framer-motion Reorder sometimes,
-                      // but typically Reorder expects list styling, we can force relative to work.
-                      className="relative w-full h-full cursor-grab active:cursor-grabbing outline-none group"
-                    >
+                {previews.map((preview) => (
+                  <Reorder.Item
+                    key={preview.id}
+                    value={preview}
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="relative w-full h-full cursor-grab active:cursor-grabbing outline-none group"
+                  >
                       <div className="group/card relative immersive-glass rounded-[16px] overflow-hidden hover:immersive-neon-border transition-all h-full flex flex-col">
                         
                         {/* Remove Button */}
@@ -297,9 +317,11 @@ export default function App() {
                         <div className="absolute bottom-0 left-0 right-0 p-3 z-10 flex flex-col items-start gap-1 pointer-events-none">
                           <div className="flex items-center gap-2.5 mb-0.5 w-full">
                             {preview.favicon ? (
-                                <img src={preview.favicon} className="w-5 h-5 rounded-[4px] bg-[#22d3ee] p-0.5" alt="Favicon" />
+                                <img src={preview.favicon} className="w-5 h-5 rounded-[4px] object-contain" alt="Favicon" />
                             ) : (
-                                <div className="w-5 h-5 rounded-[4px] bg-[#22d3ee] flex-shrink-0" />
+                                <div className="w-5 h-5 rounded-[4px] bg-[rgba(255,255,255,0.1)] flex items-center justify-center flex-shrink-0">
+                                  <LinkIcon size={12} className="text-white/50" />
+                                </div>
                             )}
                             <div className="text-[12px] font-semibold text-[#f8fafc] truncate w-full tracking-wide">
                               {preview.title || new URL(preview.url).hostname.replace('www.', '')}
@@ -315,7 +337,6 @@ export default function App() {
                       </div>
                     </Reorder.Item>
                   ))}
-                </AnimatePresence>
               </Reorder.Group>
             </div>
           )}
